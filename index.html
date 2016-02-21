@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conway Shader</title>
+    <title>Mass-Spring Shader</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -26,12 +26,19 @@
     <script id="2d-fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
 
-        uniform sampler2D u_image;//texture array
+        //texture arrays
+        //uniform sampler2D u_position;
+        uniform sampler2D u_image;//pos, velocity, acceleration = r, g, b
 
         varying vec2 v_texCoord;
         uniform vec2 u_textureSize;
 
         uniform vec2 u_mouseCoord;
+
+        uniform float u_kSpring;
+        uniform float u_dSpring;
+        uniform float u_mass;
+        uniform float u_dt;
 
         void main() {
 
@@ -39,35 +46,35 @@
 
             vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
 
-            float tol = 0.005;
-            if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
-                gl_FragColor = vec4(1.0,1.0,1.0,1);
-                return;
-            }
+            //float tol = 0.005;
+            //if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
+            //    gl_FragColor = vec4(1.0,1.0,1.0,1);
+            //    return;
+            //}
 
+            vec4 offset = vec4(0.5, 0.5, 0.5, 0);
 
+            vec4 currentState = texture2D(u_image, v_texCoord) - offset;
 
-            vec4 rawTextureData = texture2D(u_image, v_texCoord);
+            float fTotal = 0.0;
 
-            int count = 0;
-            for (int i=-1;i<2;i++){
-                for (int j=-1;j<2;j++){
+            for (int i=-1;i<=1;i+=2){
+                for (int j=-1;j<=1;j+=2){
                     if (i == 0 && j == 0) continue;
                     vec2 neighborCoord = v_texCoord + vec2(onePixel.x*float(i), onePixel.y*float(j));
-                    if (vec4(texture2D(u_image, neighborCoord)).r == 1.0) count++;
+                    vec4 neighborState = texture2D(u_image, neighborCoord) - offset;
+                    float deltaP =  currentState.r - neighborState.r;
+                    //float deltaV = neighborState.g - currentState.g;
+
+                    fTotal += u_kSpring*deltaP;// - u_dSpring*deltaV;
                 }
             }
 
+            float acceleration = fTotal/u_mass;
+            float velocity = acceleration*u_dt + currentState.g;
+            float position = velocity*u_dt + currentState.r;
 
-            if (count == 3) {
-                gl_FragColor = vec4(1.0,1.0,1.0,1);
-                return;
-            }
-            if (rawTextureData.x == 1.0 && count == 2){
-                gl_FragColor = vec4(1.0,1.0,1.0,1);
-                return;
-            }
-            gl_FragColor = vec4(0,0,0,1);
+            gl_FragColor = vec4(position,velocity,acceleration,1) + offset;
         }
     </script>
 </head>

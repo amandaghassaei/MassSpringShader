@@ -64,6 +64,15 @@ function initGL() {
             1.0, 1.0]
         ), gl.STATIC_DRAW);
 
+    //constants
+    var kSpringLocation = gl.getUniformLocation(program, "u_kSpring");
+    gl.uniform1f(kSpringLocation, 2.0);
+    var dSpringLocation = gl.getUniformLocation(program, "u_dSpring");
+    gl.uniform1f(dSpringLocation, 0.0);
+    var massLocation = gl.getUniformLocation(program, "u_mass");
+    gl.uniform1f(massLocation, 1.0);
+    var dtLocation = gl.getUniformLocation(program, "u_dt");
+    gl.uniform1f(dtLocation, 1.0);
 
     //flip y
     flipYLocation = gl.getUniformLocation(program, "u_flipY");
@@ -113,14 +122,12 @@ function makeFlatArray(rgba){
 }
 
 function makeRandomArray(rgba){
-    var numPixels = rgba.length/4;
-    var probability = 0.15;
-    for (var i=0;i<numPixels;i++) {
-        var ii = i * 4;
-        var state = Math.random() < probability ? 1 : 0;
-        rgba[ii] = rgba[ii + 1] = rgba[ii + 2] = state ? 255 : 0;
-        rgba[ii + 3] = 255;
-    }
+    //for (var x=width/2-100;x<width/2+100;x++) {
+    //    for (var y=height/2-100;y<height/2+100;y++) {
+    //        var ii = (y*width + x) * 4;
+    //        rgba[ii] = 200;
+    //    }
+    //}
     return rgba;
 }
 
@@ -205,6 +212,7 @@ function onResize(){
     resizedLastState = makeTexture(gl);
     //fill with random pixels
     var rgba = new Uint8Array(width*height*4);
+    rgba = makeFlatArray(rgba);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, makeRandomArray(rgba));
 
     paused = false;
