@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conway Shader</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script type="text/javascript" src="GlBoilerplate.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+
+        attribute vec2 a_position;
+
+        uniform float u_flipY;
+
+        attribute vec2 a_texCoord;
+        varying vec2 v_texCoord;
+
+        void main() {
+           gl_Position = vec4(a_position.x, u_flipY*a_position.y, 0, 1);
+           v_texCoord = a_texCoord;
+        }
+    </script>
+
+    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        uniform sampler2D u_image;//texture array
+
+        varying vec2 v_texCoord;
+        uniform vec2 u_textureSize;
+
+        uniform vec2 u_mouseCoord;
+
+        void main() {
+
+            vec2 onePixel = vec2(1.0, 1.0)/u_textureSize;
+
+            vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
+
+            float tol = 0.005;
+            if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
+                gl_FragColor = vec4(1.0,1.0,1.0,1);
+                return;
+            }
+
+
+
+            vec4 rawTextureData = texture2D(u_image, v_texCoord);
+
+            int count = 0;
+            for (int i=-1;i<2;i++){
+                for (int j=-1;j<2;j++){
+                    if (i == 0 && j == 0) continue;
+                    vec2 neighborCoord = v_texCoord + vec2(onePixel.x*float(i), onePixel.y*float(j));
+                    if (vec4(texture2D(u_image, neighborCoord)).r == 1.0) count++;
+                }
+            }
+
+
+            if (count == 3) {
+                gl_FragColor = vec4(1.0,1.0,1.0,1);
+                return;
+            }
+            if (rawTextureData.x == 1.0 && count == 2){
+                gl_FragColor = vec4(1.0,1.0,1.0,1);
+                return;
+            }
+            gl_FragColor = vec4(0,0,0,1);
+        }
+    </script>
+</head>
+<body>
+
+<canvas id="glcanvas"></canvas>
+
+</body>
+</html>
