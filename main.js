@@ -16,6 +16,7 @@ var width;
 var height;
 
 var flipYLocation;
+var renderFlagLocation;
 var textureSizeLocation;
 var mouseCoordLocation;
 
@@ -32,7 +33,7 @@ function initGL() {
 
     canvas.onmousemove = onMouseMove;
 
-    //window.onresize = onResize;
+    window.onresize = onResize;
 
     gl = canvas.getContext("webgl", { antialias: false}) || canvas.getContext("experimental-webgl", { antialias: false});
     if (!gl) {
@@ -66,16 +67,19 @@ function initGL() {
 
     //constants
     var kSpringLocation = gl.getUniformLocation(program, "u_kSpring");
-    gl.uniform1f(kSpringLocation, 2.0);
+    gl.uniform1f(kSpringLocation, 20.0);
     var dSpringLocation = gl.getUniformLocation(program, "u_dSpring");
     gl.uniform1f(dSpringLocation, 0.0);
     var massLocation = gl.getUniformLocation(program, "u_mass");
-    gl.uniform1f(massLocation, 1.0);
+    gl.uniform1f(massLocation, 1000.0);
     var dtLocation = gl.getUniformLocation(program, "u_dt");
     gl.uniform1f(dtLocation, 1.0);
 
     //flip y
     flipYLocation = gl.getUniformLocation(program, "u_flipY");
+
+    //renderflag
+    renderFlagLocation = gl.getUniformLocation(program, "u_renderFlag");
 
     //set texture location
     var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
@@ -115,19 +119,19 @@ function makeFlatArray(rgba){
     var numPixels = rgba.length/4;
     for (var i=0;i<numPixels;i++) {
         var ii = i * 4;
-        rgba[ii] = rgba[ii + 1] = rgba[ii + 2] = 127;
+        rgba[ii] = rgba[ii + 1] = rgba[ii + 2] = 128;
         rgba[ii + 3] = 255;
     }
     return rgba;
 }
 
 function makeRandomArray(rgba){
-    //for (var x=width/2-100;x<width/2+100;x++) {
-    //    for (var y=height/2-100;y<height/2+100;y++) {
-    //        var ii = (y*width + x) * 4;
-    //        rgba[ii] = 200;
-    //    }
-    //}
+    for (var x=width/2-100;x<width/2+100;x++) {
+        for (var y=height/2-100;y<height/2+100;y++) {
+            var ii = (y*width + x) * 4;
+            rgba[ii] = 200;
+        }
+    }
     return rgba;
 }
 
@@ -158,13 +162,14 @@ function render(){
             resizedCurrentState = null;
         }
 
-        // don't y flip images while drawing to the textures
-        gl.uniform1f(flipYLocation, 1);
+        gl.uniform1f(flipYLocation, 1);// don't y flip images while drawing to the textures
+        gl.uniform1f(renderFlagLocation, 0);
 
         step();
 
 
         gl.uniform1f(flipYLocation, -1);  // need to y flip for canvas
+        gl.uniform1f(renderFlagLocation, 1);//only plot position on render
         gl.bindTexture(gl.TEXTURE_2D, lastState);
 
 
