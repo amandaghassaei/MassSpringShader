@@ -42,6 +42,7 @@ function initGL() {
     }
 
     gl.disable(gl.DEPTH_TEST);
+    gl.getExtension('OES_texture_float');
 
     // setup a GLSL program
     var program = createProgramFromScripts(gl, "2d-vertex-shader", "2d-fragment-shader");
@@ -67,11 +68,11 @@ function initGL() {
 
     //constants
     var kSpringLocation = gl.getUniformLocation(program, "u_kSpring");
-    gl.uniform1f(kSpringLocation, 20.0);
+    gl.uniform1f(kSpringLocation, 2.0);
     var dSpringLocation = gl.getUniformLocation(program, "u_dSpring");
-    gl.uniform1f(dSpringLocation, 0.0);
+    gl.uniform1f(dSpringLocation, 1.0);
     var massLocation = gl.getUniformLocation(program, "u_mass");
-    gl.uniform1f(massLocation, 1000.0);
+    gl.uniform1f(massLocation, 10.0);
     var dtLocation = gl.getUniformLocation(program, "u_dt");
     gl.uniform1f(dtLocation, 1.0);
 
@@ -118,9 +119,7 @@ function initGL() {
 function makeFlatArray(rgba){
     var numPixels = rgba.length/4;
     for (var i=0;i<numPixels;i++) {
-        var ii = i * 4;
-        rgba[ii] = rgba[ii + 1] = rgba[ii + 2] = 128;
-        rgba[ii + 3] = 255;
+        rgba[i * 4 + 3] = 1;
     }
     return rgba;
 }
@@ -129,7 +128,7 @@ function makeRandomArray(rgba){
     for (var x=width/2-100;x<width/2+100;x++) {
         for (var y=height/2-100;y<height/2+100;y++) {
             var ii = (y*width + x) * 4;
-            rgba[ii] = 200;
+            //rgba[ii] = 30;
         }
     }
     return rgba;
@@ -212,13 +211,13 @@ function onResize(){
 
     //texture for saving output from frag shader
     resizedCurrentState = makeTexture(gl);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, null);
 
     resizedLastState = makeTexture(gl);
     //fill with random pixels
-    var rgba = new Uint8Array(width*height*4);
+    var rgba = new Float32Array(width*height*4);
     rgba = makeFlatArray(rgba);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, makeRandomArray(rgba));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, makeRandomArray(rgba));
 
     paused = false;
 }

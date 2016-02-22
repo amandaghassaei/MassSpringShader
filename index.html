@@ -46,43 +46,43 @@
 
             vec2 onePixel = vec2(1.0, 1.0)/u_textureSize;
 
-            vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
-
-            //float tol = 0.005;
-            //if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
-            //    gl_FragColor = vec4(1.0,1.0,1.0,1);
-            //    return;
-            //}
-
-            vec4 offset = vec4(0.5, 0.5, 0.5, 0);
-
-            vec4 currentState = texture2D(u_image, v_texCoord) - offset;
+            vec4 currentState = texture2D(u_image, v_texCoord);
 
             if (u_renderFlag == 1.0){
-                gl_FragColor = vec4(currentState.r,currentState.r,currentState.r,1) + offset;
+                float position = currentState.r/10.0;
+                position += 0.5;
+                if (position > 1.0) position = 1.0;
+                if (position < 0.0) position = 0.0;
+                gl_FragColor = vec4(position,position,position,1);
                 return;
             }
 
             float fTotal = 0.0;
+
+            vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
+
+            float tol = 0.005;
+            if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
+                fTotal += 20.0;
+            }
+
 
             for (int i=-1;i<=1;i+=2){
                 for (int j=-1;j<=1;j+=2){
                     if (i == 0 && j == 0) continue;
                     vec2 neighborCoord = v_texCoord + vec2(onePixel.x*float(i), onePixel.y*float(j));
 
-
                     vec4 neighborState;
-                    //if (neighborCoord.x < 0.0 || neighborCoord.y < 0.0 ||
-                    //    neighborCoord.x > u_textureSize.x - onePixel.x || neighborCoord.y > u_textureSize.y - onePixel.y){
-                    //    neighborState = vec4(0,0,0,0);
-                    //} else {
-                        neighborState = texture2D(u_image, neighborCoord) - offset;
-                    //}
+                    if (neighborCoord.x < 0.0 || neighborCoord.y < 0.0 || neighborCoord.x >= 1.0 || neighborCoord.y >= 1.0){
+                        neighborState = vec4(0.0,0.0,0.0,1.0);
+                    } else {
+                        neighborState = texture2D(u_image, neighborCoord);
+                    }
 
                     float deltaP =  neighborState.r - currentState.r;
                     float deltaV = neighborState.g - currentState.g;
 
-                    fTotal += u_kSpring*deltaP - u_dSpring*deltaV;
+                    fTotal += u_kSpring*deltaP + u_dSpring*deltaV;
                 }
             }
 
@@ -90,7 +90,7 @@
             float velocity = acceleration*u_dt + currentState.g;
             float position = velocity*u_dt + currentState.r;
 
-            gl_FragColor = vec4(position,velocity,acceleration,1) + offset;
+            gl_FragColor = vec4(position,velocity,acceleration,1);
         }
     </script>
 </head>
