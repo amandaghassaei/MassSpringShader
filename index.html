@@ -34,6 +34,7 @@
         uniform vec2 u_textureSize;
 
         uniform vec2 u_mouseCoord;
+        uniform float u_mouseEnable;
 
         uniform float u_kSpring;
         uniform float u_dSpring;
@@ -49,21 +50,22 @@
             vec4 currentState = texture2D(u_image, v_texCoord);
 
             if (u_renderFlag == 1.0){
-                float position = currentState.r/10.0;
+                float position = currentState.r/20.0;
                 position += 0.5;
                 if (position > 1.0) position = 1.0;
                 if (position < 0.0) position = 0.0;
-                gl_FragColor = vec4(position,position,position,1);
+                gl_FragColor = vec4((255.0*position)/255.0,(179.0*(1.0-position))/255.0,(150.0-54.0*position)/255.0,1.0);
                 return;
             }
 
             float fTotal = 0.0;
 
-            vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
-
-            float tol = 0.005;
-            if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
-                fTotal += 20.0;
+            if (u_mouseEnable == 1.0){
+                vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
+                float tol = 0.005;
+                if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
+                    fTotal += 20.0;//upward force from mouse
+                }
             }
 
 

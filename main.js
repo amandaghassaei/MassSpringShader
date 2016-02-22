@@ -18,7 +18,9 @@ var height;
 var flipYLocation;
 var renderFlagLocation;
 var textureSizeLocation;
+
 var mouseCoordLocation;
+var mouseEnableLocation;
 
 var paused = false;//while window is resizing
 
@@ -32,6 +34,8 @@ function initGL() {
     canvas.height = canvas.clientHeight;
 
     canvas.onmousemove = onMouseMove;
+    canvas.onmouseout = onMouseOut;
+    canvas.onmouseover = onMouseIn;
 
     window.onresize = onResize;
 
@@ -99,6 +103,7 @@ function initGL() {
 
     textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
     mouseCoordLocation = gl.getUniformLocation(program, "u_mouseCoord");
+    mouseEnableLocation = gl.getUniformLocation(program, "u_mouseEnable");
 
 
 
@@ -224,4 +229,12 @@ function onResize(){
 
 function onMouseMove(e){
     gl.uniform2f(mouseCoordLocation, e.clientX/width, e.clientY/height);
+}
+
+function onMouseOut(){
+    gl.uniform1f(mouseEnableLocation, 0);
+}
+
+function onMouseIn(){
+    gl.uniform1f(mouseEnableLocation, 1);
 }
