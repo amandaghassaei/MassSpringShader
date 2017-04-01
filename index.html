@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <title>Mass-Spring Shader</title>
 
+    <link rel="stylesheet" type="text/css" href="dependencies/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="dependencies/flat-ui.min.css">
     <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script type="text/javascript" src="dependencies/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="dependencies/flat-ui.min.js"></script>
 
     <script type="text/javascript" src="GlBoilerplate.js"></script>
     <script type="text/javascript" src="main.js"></script>
@@ -95,10 +100,35 @@
             gl_FragColor = vec4(position,velocity,acceleration,1);
         }
     </script>
+
 </head>
 <body>
 
 <canvas id="glcanvas"></canvas>
+
+<a href="#" id="about">?</a>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <b>Mass-Spring-Damper Shader</b><br/><br/>
+
+                A physical simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, running on the GPU.
+                At each frame, the masses exert forces on each other and the resulting acceleration, velocity, and position of each mass (pixel) is solved via
+                <a href="https://en.wikipedia.org/wiki/Euler_method" target="_blank">euler integration</a>.
+                Scrolling over with your mouse applies an upward force to the nearby pixels.<br/><br/>
+                This simulation is equivalent to a <a href="https://en.wikipedia.org/wiki/Wave_equation" target="_blank">discrete, damped 2D wave equation</a>
+                or <a href="https://en.wikipedia.org/wiki/Cloth_modeling" target="_blank">cloth simulation</a>.<br/><br/>
+
+                Simulation requires only WebGL, no external libraries.<br/><br/>
+
+                By <a href="http://www.amandaghassaei.com/" target="_blank">Amanda Ghassaei</a>, code on <a href="https://github.com/amandaghassaei/MassSpringShader" target="_blank">Github</a>.
+                <br/><br/>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

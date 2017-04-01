@@ -28,6 +28,11 @@ window.onload = initGL;
 
 function initGL() {
 
+    $("#about").click(function(e){
+        e.preventDefault();
+        $("#aboutModal").modal('show');
+    });
+
     // Get A WebGL context
     canvas = document.getElementById("glcanvas");
     canvas.width = canvas.clientWidth;
