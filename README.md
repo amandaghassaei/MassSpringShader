@@ -1,7 +1,7 @@
 # MassSpringShader
 WebGL Shader that implements a mass-spring physical simulation
 
-<img src=""/>
+<img src="https://raw.githubusercontent.com/amandaghassaei/MassSpringShader/master/img.png"/>
 
 Live demo at <a href="http://git.amandaghassaei.com/MassSpringShader/" target="_blank">git.amandaghassaei.com/MassSpringShader/</a>
 
