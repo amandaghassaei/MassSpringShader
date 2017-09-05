@@ -123,6 +123,7 @@ function initGL() {
 
     gl.bindTexture(gl.TEXTURE_2D, lastState);//original texture
 
+    onMouseIn();
     render();
 }
 

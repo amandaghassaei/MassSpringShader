@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mass-Spring Shader</title>
+    <title>Mass-Spring-Damper Shader</title>
 
     <link rel="stylesheet" type="text/css" href="dependencies/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="dependencies/flat-ui.min.css">
@@ -59,7 +59,20 @@
                 position += 0.5;
                 if (position > 1.0) position = 1.0;
                 if (position < 0.0) position = 0.0;
-                gl_FragColor = vec4((255.0*position)/255.0,(179.0*(1.0-position))/255.0,(150.0-54.0*position)/255.0,1.0);
+
+                if (position < 0.5){
+                    position *= 2.0;
+                    //position = 0 -> blue
+                    //position = 1 -> magenta
+                    gl_FragColor = vec4((255.0*position)/255.0,(179.0*(1.0-position))/255.0,(150.0-54.0*position)/255.0,1.0);
+                } else {
+                    position -= 0.5;
+                    position *= 2.0;
+                    //position = 0 -> magenta
+                    //position = 1 -> white
+                    gl_FragColor = vec4((255.0-(10.0*position))/255.0,(223.0*position)/255.0,(106.0+(67.0*position))/255.0,1.0);
+                }
+
                 return;
             }
 
@@ -69,7 +82,7 @@
                 vec2 pxDistFromMouse = (v_texCoord - u_mouseCoord)*(v_texCoord - u_mouseCoord)/onePixel;
                 float tol = 0.005;
                 if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
-                    fTotal += 20.0;//upward force from mouse
+                    fTotal -= 20.0;//upward force from mouse
                 }
             }
 
@@ -100,7 +113,6 @@
             gl_FragColor = vec4(position,velocity,acceleration,1);
         }
     </script>
-
 </head>
 <body>
 
@@ -112,17 +124,20 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <b>Mass-Spring-Damper Shader</b><br/><br/>
+                <b>Mass-Spring-Damper Shader</b><br/>
 
-                A physical simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, running on the GPU.
-                At each frame, the masses exert forces on each other and the resulting acceleration, velocity, and position of each mass (pixel) is solved via
-                <a href="https://en.wikipedia.org/wiki/Euler_method" target="_blank">euler integration</a>.
-                Scrolling over with your mouse applies an upward force to the nearby pixels.<br/><br/>
+                <img src="img.png" style="width:100%;margin-top:10px"><br/><br/>
+
+                This is a physical simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, all running in a GPU fragment shader with WebGL.
+                In the simulation, each pixel on the screen is a mass in a 2D mesh.
+                At each frame, the masses exert forces on each other and the resulting acceleration, velocity, and position of each mass is solved via
+                <a href="https://en.wikipedia.org/wiki/Euler_method" target="_blank">Euler integration</a>.  The vertical displacement of the masses is indicated by the color
+                of the pixel, blue pixels have positive vertical displacement, white have negative displacement, and pink is zero displacement.
+                Scrolling over with your mouse applies an upward force to the nearby pixels.
                 This simulation is equivalent to a <a href="https://en.wikipedia.org/wiki/Wave_equation" target="_blank">discrete, damped 2D wave equation</a>
-                or <a href="https://en.wikipedia.org/wiki/Cloth_modeling" target="_blank">cloth simulation</a>.<br/><br/>
-
-                Simulation requires only WebGL, no external libraries.<br/><br/>
-
+                or <a href="https://en.wikipedia.org/wiki/Cloth_modeling" target="_blank">cloth simulation</a>.  Masses at the edges of the screen are fixed with zero displacement,
+                making the simulation behave like a giant trampoline.
+                <br/><br/>
                 By <a href="http://www.amandaghassaei.com/" target="_blank">Amanda Ghassaei</a>, code on <a href="https://github.com/amandaghassaei/MassSpringShader" target="_blank">Github</a>.
                 <br/><br/>
             </div>
