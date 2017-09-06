@@ -128,6 +128,9 @@ function initGL() {
 
     gl.bindTexture(gl.TEXTURE_2D, lastState);//original texture
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, currentState, 0);
+
     var check = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     if (check != gl.FRAMEBUFFER_COMPLETE){
         notSupported();
