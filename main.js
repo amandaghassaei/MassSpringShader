@@ -41,6 +41,7 @@ function initGL() {
     canvas.onmousemove = onMouseMove;
     canvas.onmouseout = onMouseOut;
     canvas.onmouseover = onMouseIn;
+    canvas.ontouchmove = onTouchMove;
 
     window.onresize = onResize;
 
@@ -51,7 +52,11 @@ function initGL() {
     }
 
     gl.disable(gl.DEPTH_TEST);
-    gl.getExtension('OES_texture_float');
+    var floatTextures = gl.getExtension('OES_texture_float');
+
+    if (!floatTextures) {
+        notSupported();
+    }
 
     // setup a GLSL program
     var program = createProgramFromScripts(gl, "2d-vertex-shader", "2d-fragment-shader");
@@ -122,6 +127,11 @@ function initGL() {
     frameBuffer = gl.createFramebuffer();
 
     gl.bindTexture(gl.TEXTURE_2D, lastState);//original texture
+
+    var check = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    if (check != gl.FRAMEBUFFER_COMPLETE){
+        notSupported();
+    }
 
     onMouseIn();
     render();
@@ -236,6 +246,12 @@ function onResize(){
 function onMouseMove(e){
     gl.uniform2f(mouseCoordLocation, e.clientX/width, e.clientY/height);
 }
+function onTouchMove(e){
+    e.preventDefault();
+    var touch = e.touches[0];
+    gl.uniform2f(mouseCoordLocation, touch.pageX/width, touch.pageY/height);
+}
+
 
 function onMouseOut(){
     gl.uniform1f(mouseEnableLocation, 0);
@@ -244,3 +260,16 @@ function onMouseOut(){
 function onMouseIn(){
     gl.uniform1f(mouseEnableLocation, 1);
 }
+
+function notSupported(){
+        var elm = '<div id="coverImg" ' +
+          'style="background: url(massspringdamper.gif) no-repeat center center fixed;' +
+            '-webkit-background-size: cover;' +
+            '-moz-background-size: cover;' +
+            '-o-background-size: cover;' +
+            'background-size: cover;">'+
+          '</div>';
+        $(elm).appendTo(body);
+        $("#noSupportModal").modal("show");
+       console.warn("floating point textures are not supported on your system");
+    }
