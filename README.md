@@ -11,7 +11,7 @@ At each frame, the masses exert forces on each other and the resulting accelerat
 <a href="https://en.wikipedia.org/wiki/Euler_method" target="_blank">Euler integration</a>.  The vertical displacement of the masses is indicated by the color
 of the pixel, blue pixels have positive vertical displacement, white have negative displacement, and pink is zero displacement.
 Scrolling over with your mouse applies an upward force to the nearby pixels.
-This physics is equivalent to a <a href="https://en.wikipedia.org/wiki/Wave_equation" target="_blank">discrete, damped 2D wave equation</a>
+The physics is equivalent to a <a href="https://en.wikipedia.org/wiki/Wave_equation" target="_blank">discrete, damped 2D wave equation</a>
 or <a href="https://en.wikipedia.org/wiki/Cloth_modeling" target="_blank">cloth simulation</a>.  Masses at the edges of the screen are fixed with zero displacement,
 making the simulation behave like a giant trampoline.
 
