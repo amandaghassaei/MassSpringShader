@@ -5,7 +5,7 @@ WebGL Shader that implements a mass-spring-damper physical simulation
 
 Live demo at <a href="http://git.amandaghassaei.com/MassSpringShader/" target="_blank">git.amandaghassaei.com/MassSpringShader/</a>
 
-This is a physical simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, all running in a GPU fragment shader with WebGL.
+This is a physics simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, all running in a GPU fragment shader with WebGL.
 In the simulation, each pixel on the screen is a mass in a 2D mesh.
 At each frame, the masses exert forces on each other and the resulting acceleration, velocity, and position of each mass is solved via
 <a href="https://en.wikipedia.org/wiki/Euler_method" target="_blank">Euler integration</a>.  The vertical displacement of the masses is indicated by the color
