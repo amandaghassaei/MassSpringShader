@@ -47,7 +47,7 @@ function initGL() {
 
     gl = canvas.getContext("webgl", { antialias: false}) || canvas.getContext("experimental-webgl", { antialias: false});
     if (!gl) {
-        alert('Could not initialize WebGL, try another browser');
+        notSupported();
         return;
     }
 
@@ -262,14 +262,14 @@ function onMouseIn(){
 }
 
 function notSupported(){
-        var elm = '<div id="coverImg" ' +
-          'style="background: url(massspringdamper.gif) no-repeat center center fixed;' +
-            '-webkit-background-size: cover;' +
-            '-moz-background-size: cover;' +
-            '-o-background-size: cover;' +
-            'background-size: cover;">'+
-          '</div>';
-        $(elm).appendTo(body);
-        $("#noSupportModal").modal("show");
-       console.warn("floating point textures are not supported on your system");
-    }
+    var elm = '<div id="coverImg" ' +
+      'style="background: url(massspringdamper.gif) no-repeat center center fixed;' +
+        '-webkit-background-size: cover;' +
+        '-moz-background-size: cover;' +
+        '-o-background-size: cover;' +
+        'background-size: cover;">'+
+      '</div>';
+    $(elm).appendTo(document.getElementsByTagName("body")[0]);
+    $("#noSupportModal").modal("show");
+   console.warn("floating point textures are not supported on your system");
+}
