@@ -44,6 +44,8 @@ function initGL() {
     canvas.onmouseout = onMouseOut;
     canvas.onmouseover = onMouseIn;
     canvas.ontouchmove = onTouchMove;
+    canvas.ontouchend = onMouseOut;
+    canvas.ontouchstart = onTouchMove;
 
     window.onresize = onResize;
 
@@ -249,10 +251,12 @@ function onResize(){
 }
 
 function onMouseMove(e){
+    gl.uniform1f(mouseEnableLocation, 1);
     gl.uniform2f(mouseCoordLocation, e.clientX/width, e.clientY/height);
 }
 function onTouchMove(e){
     e.preventDefault();
+    gl.uniform1f(mouseEnableLocation, 1);
     var touch = e.touches[0];
     gl.uniform2f(mouseCoordLocation, touch.pageX/width, touch.pageY/height);
 }
