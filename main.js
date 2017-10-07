@@ -24,6 +24,8 @@ var mouseEnableLocation;
 
 var paused = false;//while window is resizing
 
+var ext;
+
 window.onload = initGL;
 
 function initGL() {
@@ -52,9 +54,9 @@ function initGL() {
     }
 
     gl.disable(gl.DEPTH_TEST);
-    var floatTextures = gl.getExtension('OES_texture_float');
+    ext = gl.getExtension('OES_texture_half_float') || gl.getExtension("EXT_color_buffer_half_float");
 
-    if (!floatTextures) {
+    if (!ext) {
         notSupported();
     }
 
@@ -235,13 +237,13 @@ function onResize(){
 
     //texture for saving output from frag shader
     resizedCurrentState = makeTexture(gl);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, ext.HALF_FLOAT_OES, null);
 
     resizedLastState = makeTexture(gl);
     //fill with random pixels
     var rgba = new Float32Array(width*height*4);
     rgba = makeFlatArray(rgba);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, makeRandomArray(rgba));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, ext.HALF_FLOAT_OES, null);
 
     paused = false;
 }
