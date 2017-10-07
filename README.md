@@ -3,7 +3,7 @@ WebGL Shader that implements a mass-spring-damper physical simulation
 
 <img src="massspringdamper.gif"/>
 
-Live demo at <a href="http://git.amandaghassaei.com/MassSpringShader/" target="_blank">git.amandaghassaei.com/MassSpringShader/</a>
+Live demo at <a href="http://apps.amandaghassaei.com/MassSpringShader/" target="_blank">apps.amandaghassaei.com/MassSpringShader/</a>
 
 This is a physics simulation of a mesh of masses attached to their four nearest neighbors with springs and dampers, all running in a GPU fragment shader with WebGL.
 In the simulation, each pixel on the screen is a mass in a 2D mesh.
