@@ -1,10 +1,20 @@
 import { GPGPU } from 'webgl-gpgpu';
+import MicroModal from 'micromodal';
 const simShaderSource = require('./kernels/SimShader.glsl');
 const renderShaderSource = require('./kernels/RenderShader.glsl');
 const interactionShaderSource = require('./kernels/InteractionShader.glsl');
 
+// Init help modal.
+MicroModal.init();
+
 const canvas = document.getElementById('glcanvas')  as HTMLCanvasElement;
-const gpgpu = new GPGPU(null, canvas);
+const gpgpu = new GPGPU(null, canvas, (message: string) => {
+	MicroModal.show('modal-2');
+	const errorEl = document.getElementById('glErrorMsg');
+	if (errorEl) errorEl.innerHTML =`Error: ${message}`;
+	const coverImg = document.getElementById('coverImg');
+	if (coverImg) coverImg.style.display = 'block';
+});
 
 gpgpu.initProgram('sim', simShaderSource, [
 	{
