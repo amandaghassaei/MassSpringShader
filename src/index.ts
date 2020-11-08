@@ -73,8 +73,7 @@ function disableZoom(e: Event) {
 
 // Add resize listener.
 onResize();
-canvas.addEventListener('resize', onResize);
-
+window.addEventListener('resize', onResize);
 function onResize() {
 	// Re-init textures at new size.
 	const width = canvas.clientWidth;
@@ -87,7 +86,6 @@ function onResize() {
 
 // Start render loop.
 window.requestAnimationFrame(step);
-
 function step() {
 	// Compute simulation.
 	gpgpu.stepNonBoundary('sim', ['lastState'], 'currentState');
