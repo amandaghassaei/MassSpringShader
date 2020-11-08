@@ -9,6 +9,7 @@ MicroModal.init();
 
 const canvas = document.getElementById('glcanvas')  as HTMLCanvasElement;
 const gpgpu = new GPGPU(null, canvas, (message: string) => {
+	// Show error modal.
 	MicroModal.show('modal-2');
 	const errorEl = document.getElementById('glErrorMsg');
 	if (errorEl) errorEl.innerHTML =`Error: ${message}`;
@@ -16,6 +17,7 @@ const gpgpu = new GPGPU(null, canvas, (message: string) => {
 	if (coverImg) coverImg.style.display = 'block';
 });
 
+// Init programs.
 gpgpu.initProgram('sim', simShaderSource, [
 	{
 		name: 'u_state',
@@ -45,16 +47,16 @@ gpgpu.initProgram('interaction', interactionShaderSource, [
 
 // Set up interactions.
 const TOUCH_RADIUS = 10;
-window.onmousemove = (e: MouseEvent) => {
+canvas.addEventListener('mousemove', (e: MouseEvent) => {
 	gpgpu.stepCircle('interaction', [e.clientX, e.clientY], TOUCH_RADIUS, ['currentState'], 'lastState');
-};
-window.ontouchmove = (e: TouchEvent) => {
+});
+canvas.addEventListener('touchmove', (e: TouchEvent) => {
 	e.preventDefault();
 	for (let i = 0; i < e.touches.length; i++) {
 		const touch = e.touches[i];
 		gpgpu.stepCircle('interaction', [touch.pageX, touch.pageY], TOUCH_RADIUS, ['currentState'], 'lastState');
 	}
-};
+});
 // Disable other gestures.
 document.addEventListener('gesturestart', disableZoom);
 document.addEventListener('gesturechange', disableZoom); 
@@ -69,9 +71,9 @@ function disableZoom(e: Event) {
 	document.body.style.transform = scale;
 }
 
-window.addEventListener('resize', onResize);
+// Add resize listener.
 onResize();
-window.requestAnimationFrame(step);
+canvas.addEventListener('resize', onResize);
 
 function onResize() {
 	// Re-init textures at new size.
@@ -82,6 +84,9 @@ function onResize() {
 	gpgpu.setProgramUniform('sim', 'u_pxSize', [1 / width, 1 / height], 'FLOAT');
 	gpgpu.onResize(canvas);
 }
+
+// Start render loop.
+window.requestAnimationFrame(step);
 
 function step() {
 	// Compute simulation.
