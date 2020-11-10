@@ -18,7 +18,7 @@ const gpgpu = new GPGPU(null, canvas, (message: string) => {
 });
 
 // Init programs.
-gpgpu.initProgram('sim', simShaderSource, [
+const sim = gpgpu.initProgram('sim', simShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
@@ -30,14 +30,14 @@ gpgpu.initProgram('sim', simShaderSource, [
 		dataType: 'FLOAT',
 	},
 ]);
-gpgpu.initProgram('render', renderShaderSource, [
+const render = gpgpu.initProgram('render', renderShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
 		dataType: 'INT',
 	},
 ]);
-gpgpu.initProgram('interaction', interactionShaderSource, [
+const interaction = gpgpu.initProgram('interaction', interactionShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
@@ -45,16 +45,24 @@ gpgpu.initProgram('interaction', interactionShaderSource, [
 	},
 ]);
 
+// Init state.
+const state = gpgpu.initDataLayer('state', {
+	width: canvas.clientWidth,
+	height: canvas.clientHeight,
+	type: 'float16',
+	numChannels: 3,
+}, true, 2);
+
 // Set up interactions.
 const TOUCH_RADIUS = 10;
 canvas.addEventListener('mousemove', (e: MouseEvent) => {
-	gpgpu.stepCircle('interaction', [e.clientX, e.clientY], TOUCH_RADIUS, ['currentState'], 'lastState');
+	gpgpu.stepCircle(interaction, [e.clientX, e.clientY], TOUCH_RADIUS, [state], state);
 });
 canvas.addEventListener('touchmove', (e: TouchEvent) => {
 	e.preventDefault();
 	for (let i = 0; i < e.touches.length; i++) {
 		const touch = e.touches[i];
-		gpgpu.stepCircle('interaction', [touch.pageX, touch.pageY], TOUCH_RADIUS, ['currentState'], 'lastState');
+		gpgpu.stepCircle(interaction, [touch.pageX, touch.pageY], TOUCH_RADIUS, [state], state);
 	}
 });
 // Disable other gestures.
@@ -78,9 +86,8 @@ function onResize() {
 	// Re-init textures at new size.
 	const width = canvas.clientWidth;
 	const height = canvas.clientHeight;
-	gpgpu.initTexture('currentState', width, height, 'float16', 3, true, undefined, true);
-	gpgpu.initTexture('lastState', width, height, 'float16', 3, true, undefined, true);
-	gpgpu.setProgramUniform('sim', 'u_pxSize', [1 / width, 1 / height], 'FLOAT');
+	state.resize(width, height);
+	sim.setUniform('u_pxSize', [1 / width, 1 / height], 'FLOAT');
 	gpgpu.onResize(canvas);
 }
 
@@ -88,11 +95,10 @@ function onResize() {
 window.requestAnimationFrame(step);
 function step() {
 	// Compute simulation.
-	gpgpu.stepNonBoundary('sim', ['lastState'], 'currentState');
+	// Ony step the interior px, we can leave the boundary static at zero.
+	gpgpu.stepNonBoundary(sim, [state], state);
 	// Render current state.
-	gpgpu.step('render', ['currentState']);
-	// Toggle textures.
-	gpgpu.swapTextures('currentState', 'lastState');
+	gpgpu.step(render, [state]);
 	// Start a new render cycle.
 	window.requestAnimationFrame(step);
 }

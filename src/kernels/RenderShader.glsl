@@ -1,10 +1,10 @@
 precision mediump float;
 
-varying vec2 uv;
+varying vec2 vUV;
 uniform sampler2D u_state;
 
 void main() {
-	float position = texture2D(u_state, uv).r / 20.0 + 0.5;
+	float position = texture2D(u_state, vUV).r / 20.0 + 0.5;
 	if (position > 1.0) position = 1.0;
 	if (position < 0.0) position = 0.0;
 

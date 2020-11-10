@@ -5,13 +5,13 @@ precision mediump float;
 #define DT 1.0
 #define MASS 10.0
 
-varying vec2 uv;
+varying vec2 vUV;
 uniform sampler2D u_state; // position, velocity, externalForces = r, g, b
 uniform vec2 u_pxSize;
 
 void main() {
 
-	vec3 currentState = texture2D(u_state, uv).xyz;
+	vec3 currentState = texture2D(u_state, vUV).xyz;
 	float currentPosition = currentState.x;
 	float currentVelocity = currentState.y;
 	float fTotal = currentState.z;
@@ -20,7 +20,7 @@ void main() {
 	for (int i = -1; i <= 1; i += 2) {
 		for (int j = -1; j <= 1; j += 2) {
 			// Calculate uv coordinate of neighbor px.
-			vec2 neighborUV = uv + vec2(u_pxSize.x * float(i), u_pxSize.y * float(j));
+			vec2 neighborUV = vUV + vec2(u_pxSize.x * float(i), u_pxSize.y * float(j));
 			// Apply spring damper constraint.
 			vec2 neighborState = texture2D(u_state, neighborUV).xy;
 			float deltaP =  neighborState.x - currentPosition;
