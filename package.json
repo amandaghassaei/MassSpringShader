@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/amandaghassaei/MassSpringShader#readme",
   "dependencies": {
-    "micromodal": "^0.4.6",
-    "webgl-gpgpu": "git+https://github.com/amandaghassaei/webgl-gpgpu.git"
+    "glcompute": "github:amandaghassaei/glcompute#66d3be9",
+    "micromodal": "^0.4.6"
   },
   "devDependencies": {
     "@types/micromodal": "^0.3.2",

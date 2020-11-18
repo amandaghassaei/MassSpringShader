@@ -1,4 +1,4 @@
-import { GPGPU } from 'webgl-gpgpu';
+import { GLCompute } from 'glcompute';
 import MicroModal from 'micromodal';
 const simShaderSource = require('./kernels/SimShader.glsl');
 const renderShaderSource = require('./kernels/RenderShader.glsl');
@@ -8,7 +8,7 @@ const interactionShaderSource = require('./kernels/InteractionShader.glsl');
 MicroModal.init();
 
 const canvas = document.getElementById('glcanvas')  as HTMLCanvasElement;
-const gpgpu = new GPGPU(null, canvas, (message: string) => {
+const glcompute = new GLCompute(null, canvas, { antialias: true }, (message: string) => {
 	// Show error modal.
 	MicroModal.show('modal-2');
 	const errorEl = document.getElementById('glErrorMsg');
@@ -18,7 +18,7 @@ const gpgpu = new GPGPU(null, canvas, (message: string) => {
 });
 
 // Init programs.
-const sim = gpgpu.initProgram('sim', simShaderSource, [
+const sim = glcompute.initProgram('sim', simShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
@@ -30,14 +30,14 @@ const sim = gpgpu.initProgram('sim', simShaderSource, [
 		dataType: 'FLOAT',
 	},
 ]);
-const render = gpgpu.initProgram('render', renderShaderSource, [
+const render = glcompute.initProgram('render', renderShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
 		dataType: 'INT',
 	},
 ]);
-const interaction = gpgpu.initProgram('interaction', interactionShaderSource, [
+const interaction = glcompute.initProgram('interaction', interactionShaderSource, [
 	{
 		name: 'u_state',
 		value: 0,
@@ -46,23 +46,22 @@ const interaction = gpgpu.initProgram('interaction', interactionShaderSource, [
 ]);
 
 // Init state.
-const state = gpgpu.initDataLayer('state', {
-	width: canvas.clientWidth,
-	height: canvas.clientHeight,
+const state = glcompute.initDataLayer('state', {
+	dimensions: [ canvas.clientWidth, canvas.clientHeight ],
 	type: 'float16',
-	numChannels: 3,
+	numComponents: 3,
 }, true, 2);
 
 // Set up interactions.
 const TOUCH_RADIUS = 10;
 canvas.addEventListener('mousemove', (e: MouseEvent) => {
-	gpgpu.stepCircle(interaction, [e.clientX, e.clientY], TOUCH_RADIUS, [state], state);
+	glcompute.stepCircle(interaction, [e.clientX, canvas.clientHeight - e.clientY], TOUCH_RADIUS, [state], state);
 });
 canvas.addEventListener('touchmove', (e: TouchEvent) => {
 	e.preventDefault();
 	for (let i = 0; i < e.touches.length; i++) {
 		const touch = e.touches[i];
-		gpgpu.stepCircle(interaction, [touch.pageX, touch.pageY], TOUCH_RADIUS, [state], state);
+		glcompute.stepCircle(interaction, [touch.pageX, canvas.clientHeight - touch.pageY], TOUCH_RADIUS, [state], state);
 	}
 });
 // Disable other gestures.
@@ -86,9 +85,9 @@ function onResize() {
 	// Re-init textures at new size.
 	const width = canvas.clientWidth;
 	const height = canvas.clientHeight;
-	state.resize(width, height);
+	state.resize([width, height]);
 	sim.setUniform('u_pxSize', [1 / width, 1 / height], 'FLOAT');
-	gpgpu.onResize(canvas);
+	glcompute.onResize(canvas);
 }
 
 // Start render loop.
@@ -96,9 +95,9 @@ window.requestAnimationFrame(step);
 function step() {
 	// Compute simulation.
 	// Ony step the interior px, we can leave the boundary static at zero.
-	gpgpu.stepNonBoundary(sim, [state], state);
+	glcompute.stepNonBoundary(sim, [state], state);
 	// Render current state.
-	gpgpu.step(render, [state]);
+	glcompute.step(render, [state]);
 	// Start a new render cycle.
 	window.requestAnimationFrame(step);
 }
